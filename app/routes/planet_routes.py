@@ -1,55 +1,46 @@
-from flask import Blueprint, abort, make_response
-from app.models.planet import planets
+from flask import Blueprint, abort, make_response, request
+from app.models.planet import Planet
+from ..db import db
 
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
 
 @planets_bp.get("", strict_slashes=False)
 def get_all_planets():
+    query = db.select(Planet).order_by(Planet.id)
+    planets = db.session.scalars(query)
+    # We could also write the line above as:
+    # books = db.session.execute(query).scalars()
+
     planets_response = []
     for planet in planets:
-        planets_response.append(dict(
-            id=planet.id,
-            name=planet.name,
-            description=planet.description,
-            moon_count=planet.moon_count
-        ))
+        planets_response.append(
+            {
+                "id": planet.id,
+                "name": planet.name,
+                "description": planet.description,
+                "moon_count:": planet.moon_count
+            }
+        )
     return planets_response
 
-# helper f-n
 
+@planets_bp.post("")
+def create_planet():
+    request_body = request.get_json()
+    name = request_body["name"]
+    description = request_body["description"]
+    moon_count = request_body["moon_count"]
 
-def validate_planet(planet_id):
-    try:
-        planet_id = int(planet_id)
-    except ValueError:
-        abort(make_response(
-            {"message": f"Planet id {planet_id} is invalid"}, 400))
+    new_planet = Planet(name=name, description=description,
+                        moon_count=moon_count)
+    db.session.add(new_planet)
+    db.session.commit()
 
-    for planet in planets:
-        if planet.id == planet_id:
-            return planet
-    abort(make_response(
-        {"message": f"Planet id {planet_id} was not found"}, 404))
-
-
-@planets_bp.get("/<planet_id>")
-def get_one_planet(planet_id):
-    planet = validate_planet(planet_id)
-
-    return {
-        "id": planet.id,
-        "name": planet.name,
-        "description": planet.description,
-        "moon_count": planet.moon_count
+    response = {
+        "id": new_planet.id,
+        "name": new_planet.name,
+        "description": new_planet.description,
+        "moon_count": new_planet.moon_count
     }
-
-
-"""     planet_response = dict(
-            id = planet.id,
-            name = planet.name,
-            description = planet.description,
-            moon_count = planet.moon_count
-    )
-
-    return planet_response """
+    return response, 201
