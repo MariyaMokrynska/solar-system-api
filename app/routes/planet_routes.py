@@ -19,7 +19,7 @@ def get_all_planets():
                 "id": planet.id,
                 "name": planet.name,
                 "description": planet.description,
-                "moon_count:": planet.moon_count
+                "moon_count": planet.moon_count
             }
         )
     return planets_response
