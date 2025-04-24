@@ -10,7 +10,7 @@ def get_all_planets():
     query = db.select(Planet).order_by(Planet.id)
     planets = db.session.scalars(query)
     # We could also write the line above as:
-    # books = db.session.execute(query).scalars()
+    # planets = db.session.execute(query).scalars()
 
     planets_response = []
     for planet in planets:
