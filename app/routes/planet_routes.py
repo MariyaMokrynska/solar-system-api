@@ -1,8 +1,21 @@
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, abort, make_response, request, Response
 from app.models.planet import Planet
 from ..db import db
 
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
+
+
+@planets_bp.put("/<id>")
+def update_planet(id):
+    planet = validate_planet(id)
+    request_body = request.get_json()
+
+    planet.name = request_body["name"]
+    planet.description = request_body["description"]
+    planet.moon_count = request_body["moon_count"]
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
 
 
 def validate_planet(id):
