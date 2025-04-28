@@ -5,6 +5,35 @@ from ..db import db
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
 
+def validate_planet(id):
+    try:
+        id = int(id)
+    except:
+        response = {"message": f"planet {id} invalid"}
+        abort(make_response(response, 400))
+
+    query = db.select(Planet).where(Planet.id == id)
+    planet = db.session.scalar(query)
+
+    if not planet:
+        response = {"message": f"planet {id} not found"}
+        abort(make_response(response, 404))
+
+    return planet
+
+
+@planets_bp.get("/<id>")
+def get_one_planet(id):
+    planet = validate_planet(id)
+
+    return {
+        "id": planet.id,
+        "name": planet.name,
+        "description": planet.description,
+        "moon_count": planet.moon_count
+    }
+
+
 @planets_bp.get("", strict_slashes=False)
 def get_all_planets():
     query = db.select(Planet).order_by(Planet.id)
