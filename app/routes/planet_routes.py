@@ -5,6 +5,15 @@ from ..db import db
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
 
+@planets_bp.delete("/<id>")
+def delete_planet(id):
+    planet = validate_planet(id)
+    db.session.delete(planet)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+
 @planets_bp.put("/<id>")
 def update_planet(id):
     planet = validate_planet(id)
