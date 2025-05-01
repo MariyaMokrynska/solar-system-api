@@ -58,10 +58,19 @@ def get_one_planet(id):
 
 @planets_bp.get("", strict_slashes=False)
 def get_all_planets():
-    query = db.select(Planet).order_by(Planet.id)
+    query = db.select(Planet)
+
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Planet.description.ilike(f"%{description_param}%"))
+
+    moon_count_param = request.args.get("moon_count")
+    if moon_count_param:
+        query = query.where(Planet.moon_count > 1)
+
+    query = query.order_by(Planet.id)
+
     planets = db.session.scalars(query)
-    # We could also write the line above as:
-    # planets = db.session.execute(query).scalars()
 
     planets_response = []
     for planet in planets:
@@ -74,6 +83,26 @@ def get_all_planets():
             }
         )
     return planets_response
+
+
+# @planets_bp.get("", strict_slashes=False)
+# def get_all_planets():
+#     query = db.select(Planet).order_by(Planet.id)
+#     planets = db.session.scalars(query)
+#     # We could also write the line above as:
+#     # planets = db.session.execute(query).scalars()
+
+#     planets_response = []
+#     for planet in planets:
+#         planets_response.append(
+#             {
+#                 "id": planet.id,
+#                 "name": planet.name,
+#                 "description": planet.description,
+#                 "moon_count": planet.moon_count
+#             }
+#         )
+#     return planets_response
 
 
 @planets_bp.post("")
