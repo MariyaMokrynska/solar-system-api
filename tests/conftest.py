@@ -4,6 +4,7 @@ from app.db import db
 from flask.signals import request_finished
 from dotenv import load_dotenv
 import os
+from app.models.planet import Planet
 
 load_dotenv()
 
@@ -31,3 +32,17 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+
+@pytest.fixture
+def two_saved_planets(app):
+    # Arrange
+    mars_planet = Planet(name="Mars",
+                         description="red planet",
+                         moon_count=2)
+    earth_planet = Planet(name="Earth",
+                          description="blue planet",
+                          moon_count=1)
+
+    db.session.add_all([mars_planet, earth_planet])
+    db.session.commit()
