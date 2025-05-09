@@ -87,3 +87,70 @@ def test_create_one_planet(client):
         "description": "rings",
         "moon_count": 7
     }
+#######
+
+
+def test_get_one_planet_succeeds(client, two_saved_planets):
+    # Act
+    response = client.get("/planets/1")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert response_body == {
+        "id": 1,
+        "name": "Mars",
+        "description": "red planet",
+        "moon_count": 2
+    }
+
+
+def test_create_one_planet_no_name(client):
+    # Arrange
+    test_data = {"description": "some planet",
+                 "moon_count": 3}
+
+    # Act
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {'message': 'Invalid request: missing name'}
+
+
+def test_create_one_planet_no_description(client):
+    # Arrange
+    test_data = {"name": "Saturn",
+                 "moon_count": 3}
+
+    # Act
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {'message': 'Invalid request: missing description'}
+
+
+def test_create_one_planet_with_extra_keys(client):
+    # Arrange
+    test_data = {
+        "extra": "some stuff",
+        "name": "Venus",
+        "description": "The Best!",
+        "moon_count": 5
+    }
+
+    # Act
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert response_body == {
+        "id": 1,
+        "name": "Venus",
+        "description": "The Best!",
+        "moon_count": 5
+    }
