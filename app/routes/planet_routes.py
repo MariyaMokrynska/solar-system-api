@@ -48,17 +48,22 @@ def validate_planet(id):
 def get_one_planet(id):
     planet = validate_planet(id)
 
-    return {
-        "id": planet.id,
-        "name": planet.name,
-        "description": planet.description,
-        "moon_count": planet.moon_count
-    }
+    return planet.to_dict()
+    # return {
+    #     "id": planet.id,
+    #     "name": planet.name,
+    #     "description": planet.description,
+    #     "moon_count": planet.moon_count
+    # }
 
 
 @planets_bp.get("", strict_slashes=False)
 def get_all_planets():
     query = db.select(Planet)
+
+    name_param = request.args.get("name")
+    if name_param:
+        query = query.where(Planet.name.ilike(f"%{name_param}%"))
 
     description_param = request.args.get("description")
     if description_param:
@@ -74,14 +79,15 @@ def get_all_planets():
 
     planets_response = []
     for planet in planets:
-        planets_response.append(
-            {
-                "id": planet.id,
-                "name": planet.name,
-                "description": planet.description,
-                "moon_count": planet.moon_count
-            }
-        )
+        planets_response.append(planet.to_dict())
+        # planets_response.append(
+        #     {
+        #         "id": planet.id,
+        #         "name": planet.name,
+        #         "description": planet.description,
+        #         "moon_count": planet.moon_count
+        #     }
+        # )
     return planets_response
 
 
@@ -124,10 +130,11 @@ def create_planet():
     db.session.add(new_planet)
     db.session.commit()
 
-    response = {
-        "id": new_planet.id,
-        "name": new_planet.name,
-        "description": new_planet.description,
-        "moon_count": new_planet.moon_count
-    }
-    return response, 201
+    # response = {
+    #     "id": new_planet.id,
+    #     "name": new_planet.name,
+    #     "description": new_planet.description,
+    #     "moon_count": new_planet.moon_count
+    # }
+    # return response, 201
+    return new_planet.to_dict(), 201
