@@ -108,12 +108,19 @@ def get_all_planets():
 @planets_bp.post("")
 def create_planet():
     request_body = request.get_json()
-    name = request_body["name"]
-    description = request_body["description"]
-    moon_count = request_body["moon_count"]
 
-    new_planet = Planet(name=name, description=description,
-                        moon_count=moon_count)
+    try:
+        new_planet = Planet.from_dict(request_body)
+        # name = request_body["name"]
+        # description = request_body["description"]
+        # moon_count = request_body["moon_count"]
+
+        # new_planet = Planet(name=name, description=description,
+        #                     moon_count=moon_count)
+    except KeyError as error:
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+
     db.session.add(new_planet)
     db.session.commit()
 

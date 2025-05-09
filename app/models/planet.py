@@ -7,3 +7,10 @@ class Planet(db.Model):
     name: Mapped[str]
     description: Mapped[str]
     moon_count: Mapped[int]
+
+    @classmethod
+    def from_dict(cls, planet_data):
+        new_planet = Planet(name=planet_data["name"],
+                            description=planet_data["description"],
+                            moon_count=planet_data["moon_count"])
+        return new_planet
