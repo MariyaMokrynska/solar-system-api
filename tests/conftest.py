@@ -5,6 +5,7 @@ from flask.signals import request_finished
 from dotenv import load_dotenv
 import os
 from app.models.planet import Planet
+from app.models.moon import Moon
 
 load_dotenv()
 
@@ -45,4 +46,12 @@ def two_saved_planets(app):
                           moon_count=1)
 
     db.session.add_all([mars_planet, earth_planet])
+    db.session.commit()
+
+
+@pytest.fixture
+def one_saved_moon(app):
+    moon = Moon(size=55.6, description="Rocky",
+                orbital_period=5)
+    db.session.add(moon)
     db.session.commit()

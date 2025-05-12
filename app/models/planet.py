@@ -1,5 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..db import db
+from sqlalchemy import ForeignKey
+from typing import Optional
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .moon import Moon
 
 
 class Planet(db.Model):
@@ -7,6 +13,8 @@ class Planet(db.Model):
     name: Mapped[str]
     description: Mapped[str]
     moon_count: Mapped[int]
+    moon_id: Mapped[Optional[int]] = mapped_column(ForeignKey("moon.id"))
+    moon: Mapped[Optional["Moon"]] = relationship(back_populates="planets")
 
     def to_dict(self):
         planet_as_dict = {}
