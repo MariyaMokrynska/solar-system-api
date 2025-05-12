@@ -1,22 +1,24 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.planet import Planet
 from ..db import db
+from .route_utilities import validate_model
 
-planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
+
+bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
 
-@planets_bp.delete("/<id>")
+@bp.delete("/<id>")
 def delete_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
     db.session.delete(planet)
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
 
 
-@planets_bp.put("/<id>")
+@bp.put("/<id>")
 def update_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
     request_body = request.get_json()
 
     planet.name = request_body["name"]
@@ -27,26 +29,9 @@ def update_planet(id):
     return Response(status=204, mimetype="application/json")
 
 
-def validate_planet(id):
-    try:
-        id = int(id)
-    except:
-        response = {"message": f"planet {id} invalid"}
-        abort(make_response(response, 400))
-
-    query = db.select(Planet).where(Planet.id == id)
-    planet = db.session.scalar(query)
-
-    if not planet:
-        response = {"message": f"planet {id} not found"}
-        abort(make_response(response, 404))
-
-    return planet
-
-
-@planets_bp.get("/<id>")
+@bp.get("/<id>")
 def get_one_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
 
     return planet.to_dict()
     # return {
@@ -57,7 +42,7 @@ def get_one_planet(id):
     # }
 
 
-@planets_bp.get("", strict_slashes=False)
+@bp.get("", strict_slashes=False)
 def get_all_planets():
     query = db.select(Planet)
 
@@ -111,7 +96,7 @@ def get_all_planets():
 #     return planets_response
 
 
-@planets_bp.post("")
+@bp.post("")
 def create_planet():
     request_body = request.get_json()
 
