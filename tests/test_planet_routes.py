@@ -117,8 +117,7 @@ def test_get_all_planets_with_two_records(client, two_saved_planets):
 
 def test_get_all_planets_with_name_query_matching_none(client, two_saved_planets):
     # Act
-    data = {"name": "Venus",
-            "moon_count": 3}
+    data = {"name": "Venus"}
     response = client.get("/planets", query_string=data)
     response_body = response.get_json()
 
@@ -130,8 +129,7 @@ def test_get_all_planets_with_name_query_matching_none(client, two_saved_planets
 def test_get_all_planets_with_name_query_matching_one(client, two_saved_planets):
     # Act
     data = {"name": "Mars",
-            "description": "red planet",
-            "moon_count": 2}
+            "description": "red planet"}
     response = client.get("/planets", query_string=data)
     response_body = response.get_json()
 

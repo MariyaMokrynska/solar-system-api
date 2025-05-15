@@ -60,7 +60,7 @@ def test_create_model_moon(client):
     # Assert
     assert isinstance(result, tuple)
     assert result[0]["id"] == 1
-    assert result[0]["size"] == 344
+    assert result[0]["size"] == 344.78
     assert result[0]["description"] == "Rock"
     assert result[0]["orbital_period"] == 43
     assert result[1] == 201
@@ -85,7 +85,9 @@ def test_create_model_moon_missing_data(client):
 def test_create_model_planet(client):
     # Arrange
     test_data = {
-        "name": "Venus"
+        "name": "Venus",
+        "description": "Scorching",
+        "moon_count": 0
     }
 
     # Act
@@ -101,6 +103,8 @@ def test_create_model_planet(client):
     assert isinstance(result, tuple)
     assert result[0]["id"] == 1
     assert result[0]["name"] == "Venus"
+    assert result[0]["description"] == "Scorching"
+    assert result[0]["moon_count"] == 0
     assert result[1] == 201
 
 # get_model
