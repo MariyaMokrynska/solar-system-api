@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..db import db
 # from sqlalchemy import ForeignKey
-from typing import Optional
+from typing import List
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ class Planet(db.Model):
     moon_count: Mapped[int]
     # moon_id: Mapped[Optional[int]] = mapped_column(ForeignKey("moon.id"))
     # moon: Mapped[Optional["Moon"]] = relationship(back_populates="planets")
-    moons: Mapped[Optional["Moon"]] = relationship(back_populates="planet")
+    moons: Mapped[List["Moon"]] = relationship(back_populates="planet")
 
     def to_dict(self):
         # planet_as_dict = {}
@@ -32,6 +32,8 @@ class Planet(db.Model):
             "description": self.description,
             "moon_count": self.moon_count
         }
+        if self.moons:
+            planet_as_dict["moons"] = [moon.to_dict() for moon in self.moons]
 
         return planet_as_dict
 
